@@ -1,0 +1,99 @@
+flowchart TD
+
+    %% Anwender
+    A["Anwender<br/>Start ZZKDRUCK"]
+
+    %% SAP
+    subgraph SAP["SAP ERP"]
+
+        B["Material lesen<br/>MARC-ZZEKONR"]
+
+        C["Etikettenkonfiguration ermitteln<br/>ZPP_ZZLABEL_KOPF
+
+• Sprache (ZZMATXLB)
+• Layout (LABNAM)
+• Logos (VAGRAF*)
+• Texte (VALUE*)
+• ..."]
+
+        D["Maschine / Drucker ermitteln<br/>ZPP_MASCH_MDLZ"]
+
+        E["Druckdaten aufbereiten"]
+
+        F["Produktionscode bilden"]
+
+        G["Sentinel-Datei erzeugen"]
+
+    end
+
+    %% Sentinel
+    subgraph SEN["Systemgrenze: Sentinel"]
+
+        H["Transferverzeichnis überwachen"]
+
+        I["Datei erkennen"]
+
+        J["Datei verarbeiten"]
+
+    end
+
+    %% Codesoft
+    subgraph CS["Systemgrenze: Codesoft"]
+
+        K["Layout laden"]
+
+        L["Variablen befüllen"]
+
+        M["Druckjob erzeugen"]
+
+    end
+
+    %% Drucker
+    subgraph PRN["Etikettendrucker"]
+
+        N["Etikett drucken"]
+
+    end
+
+    %% Protokollierung
+    subgraph LOG["SAP ERP"]
+
+        O["Protokollierung<br/>ZZKDRUCK_PROT"]
+
+    end
+
+    %% Hauptprozess
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+
+    %% Schnittstellen
+    G ==>|"Schnittstelle 1<br/>Dateiübergabe"| H
+
+    H --> I
+    I --> J
+
+    J ==>|"Schnittstelle 2<br/>Codesoft-Automation"| K
+
+    K --> L
+    L --> M
+
+    M ==>|"Schnittstelle 3<br/>Druckerspooler"| N
+
+    N -. "Rückmeldung" .-> O
+
+    %% Farben
+    classDef sap fill:#D9EAF7,stroke:#2F75B5,stroke-width:2px;
+    classDef config fill:#9DC3E6,stroke:#1F4E79,stroke-width:4px,color:#000;
+    classDef sentinel fill:#FFF2CC,stroke:#BF9000,stroke-width:2px;
+    classDef codesoft fill:#E2F0D9,stroke:#548235,stroke-width:2px;
+    classDef printer fill:#F4CCCC,stroke:#CC0000,stroke-width:2px;
+
+    class B,D,E,F,G,O sap;
+    class C config;
+    class H,I,J sentinel;
+    class K,L,M codesoft;
+    class N printer;
